@@ -3,6 +3,7 @@
 //
 #include "LogContent.h"
 #include "logProcess.h"
+#include "MissMatchExcept.h"
 
 /**
  *
@@ -134,6 +135,8 @@ std::vector<FormatSubString> preProcess(std::string &format) {
  * 对一条raw inputLog按照格式字符串得到的串序列seq进行解析
  */
 Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
+    //变量初始化，包括seq指针和input指针
+    //还有返回的log变量
     int nowSeq = 0, seqSize = seq.size();
     int nowInputPtr = 0, inputLen = inputStr.size();
     Log resLog;
@@ -142,10 +145,12 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case SPLITTER:{
                 //进行分隔串的匹配
                 int i = 0;
+                //逐字符匹配即可
                 for (i = 0; i < seq[nowSeq].subStr.size() && seq[nowSeq].subStr[i] == inputStr[nowInputPtr];
                 i++,nowInputPtr++);
                 if (i != seq[nowSeq].subStr.size()) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for splitter");
                 } else {
                     //匹配成功
                     nowSeq++;
@@ -161,6 +166,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case CREATED:{//匹配浮点数，可能没有小数点
                 if (!std::isdigit(inputStr[nowInputPtr])) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for CREATED");
                 } else {
                     int tmpPtr = nowInputPtr;
                     while(std::isdigit(inputStr[nowInputPtr])) nowInputPtr++;
@@ -182,6 +188,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for FILENAME");
                 } else {
                     resLog.contents.push_back({"filename", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;
@@ -197,6 +204,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for FUNC_NAME");
                 } else {
                     resLog.contents.push_back({"funcName", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;
@@ -227,6 +235,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                         break;
                     }
                     default:{//TODO:错误处理
+                        throw MissMatchExcept("Miss match for LEVEL_NAME");
                         break;
                     }
                 }
@@ -238,6 +247,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case LEVEL_NO:{
                 if (!std::isdigit(inputStr[nowInputPtr])) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for LEVEL_NO");
                 } else {
                     //TODO:错误处理
                     resLog.contents.push_back({"levelno", inputStr.substr(nowInputPtr, 2)});
@@ -249,6 +259,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case LINENO:{
                 if (!std::isdigit(inputStr[nowInputPtr])) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for LINENO");
                 } else {
                     int tmpPtr = nowInputPtr;
                     while(std::isdigit(inputStr[nowInputPtr])) nowInputPtr++;
@@ -266,6 +277,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for MESSAGE");
                 } else {
                     resLog.contents.push_back({"message", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;
@@ -281,6 +293,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for MODULE");
                 } else {
                     resLog.contents.push_back({"module", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;
@@ -290,6 +303,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case MSECS:{
                 if (!std::isdigit(inputStr[nowInputPtr])) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for MSECS");
                 } else {
                     int tmpPtr = nowInputPtr;
                     while(std::isdigit(inputStr[nowInputPtr]) && nowInputPtr - tmpPtr < 3) nowInputPtr++;//0-999的一个数字
@@ -307,6 +321,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for NAME");
                 } else {
                     resLog.contents.push_back({"name", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;
@@ -322,6 +337,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for PATHNAME");
                 } else {
                     resLog.contents.push_back({"pathname", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;
@@ -331,6 +347,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case PROCESS:{
                 if (!std::isdigit(inputStr[nowInputPtr])) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for PROCESS");
                 } else {
                     int tmpPtr = nowInputPtr;
                     while(std::isdigit(inputStr[nowInputPtr])) nowInputPtr++;
@@ -348,6 +365,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for PROCESS_NAME");
                 } else {
                     resLog.contents.push_back({"pathname", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;
@@ -357,6 +375,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case RELATIVE_CREATED:{
                 if (!std::isdigit(inputStr[nowInputPtr])) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for RELATIVE_CREATED");
                 } else {
                     int tmpPtr = nowInputPtr;
                     while(std::isdigit(inputStr[nowInputPtr])) nowInputPtr++;//0-999的一个数字
@@ -368,6 +387,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
             case THREAD:{
                 if (!std::isdigit(inputStr[nowInputPtr])) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for THREAD");
                 } else {
                     int tmpPtr = nowInputPtr;
                     while(std::isdigit(inputStr[nowInputPtr])) nowInputPtr++;
@@ -385,6 +405,7 @@ Log processSingle(std::vector<FormatSubString> seq, std::string inputStr) {
                 }
                 if (nowInputPtr == inputLen && inputStr[nowInputPtr] != nextStart) {
                     //TODO:失配处理
+                    throw MissMatchExcept("Miss match for THREAD_NAME");
                 } else {
                     resLog.contents.push_back({"threadName", inputStr.substr(tmpPtr, nowInputPtr - tmpPtr)});
                     nowSeq++;

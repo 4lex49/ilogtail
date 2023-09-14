@@ -13,6 +13,7 @@ int main() {
     for (auto &s:seq) {
         std::cout<<s.type<<" \"" << s.subStr << "\"\n";
     }
+    //测试processSingle函数
     std::string inputStr = "Asctime: 2023-08-22 23:57:45,454 Created: 1692719865.454855 # "
                            "Filename: main.py #funcName: <module> #levelname: INFO "
                            "#levelno: 20 #lineno: 21 #message: infoNow! #  "
@@ -21,6 +22,19 @@ int main() {
                            "#process: 23400 #processName: MainProcess "
                            "#reCr: 3   #Thr: 8700 #Thrn: MainThread";
     Log log = processSingle(seq, inputStr);
+    for (auto &s:log.contents) {
+        std::cout << s.key << ": " << s.value << '\n';
+    }
+    //测试简单的分隔串错误处理
+    std::string testStr = "aabbcc";
+    seq = preProcess(testStr);
+    inputStr = "aabbcc";
+    log = processSingle(seq, inputStr);
+    for (auto &s:log.contents) {
+        std::cout << s.key << ": " << s.value << '\n';
+    }
+    inputStr = "aab";
+    log = processSingle(seq, inputStr);
     for (auto &s:log.contents) {
         std::cout << s.key << ": " << s.value << '\n';
     }
